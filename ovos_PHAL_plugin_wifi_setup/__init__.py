@@ -398,19 +398,19 @@ class WifiSetupPlugin(PHALPlugin):
                 # If we do find a registered client that has requires_input set to false, we can use it
                 # example (balena-wifi-setup)
                 LOG.debug("LAUNCHING NON INPUT INTERACTIVE SETUP")
-                for agent in self.registered_clients:
-                    if not agent["requires_input"]:
-                        agent_name = agent["client"]
-                        agent_id = agent["id"]
+                
+                # First check if there are any clients registered at all
+                if len(self.registered_clients) == 0:
+                    LOG.error("No clients registered")
+                
+                # Check if there are any clients that do not require input
+                for client in self.registered_clients:
+                    if not client["requires_input"]:
                         self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", { 
-                            "client": agent_name, 
-                            "id": agent_id
+                            "client": client["client"], 
+                            "id": client["id"]
                         }))
-                        break
-                    else:
-                        LOG.error("No registered clients found")
-                        self.bus.emit(Message("ovos.phal.wifi.plugin.setup.failed", {"error": "No registered clients found"}))
-                        break
+                        return
 
         except Exception as e:
             LOG.exception(e)
