@@ -421,6 +421,8 @@ class WifiSetupPlugin(PHALPlugin):
         self.enclosure.mouth_reset()
         # sync clock as soon as we have internet
         self.bus.emit(Message("system.ntp.sync"))
+        # We don't know if the user has configured setup, so we'll just emit a message for setup skill
+        self.bus.emit(Message("ovos.wifi.setup.completed"))        
         self.stop_setup()  # just in case
 
     def stop_setup(self):
