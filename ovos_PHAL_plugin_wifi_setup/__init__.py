@@ -4,7 +4,6 @@ import uuid
 from os.path import dirname, join
 from time import sleep
 
-from json_database import JsonStorageXDG
 from mycroft_bus_client.message import Message
 from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import create_daemon
@@ -121,8 +120,7 @@ class WifiSetupPlugin(PHALPlugin):
         # 0 = Normal Operation, 1 = Skipped (User selected to skip setup)
         # if the user selected to skip setup, we will not start the setup process or check for internet, etc.
         # until the user explicitly tells us to start the setup process again either through VUI or GUI interaction
-        self.plugin_setup_configuration = JsonStorageXDG("ovos-PHAL-plugin-wifi-setup-configuration")
-        self.plugin_setup_mode = self.plugin_setup_configuration.get("plugin_setup_mode", 0)
+        self.plugin_setup_mode = 0
         
         # Manage client registration, activation and deactivation
         # Multiple clients can be registered, but only one can be active at a time
@@ -309,15 +307,11 @@ class WifiSetupPlugin(PHALPlugin):
         
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
-        self.plugin_setup_configuration["plugin_setup_mode"] = self.plugin_setup_mode
-        self.plugin_setup_configuration.store()
         
     def handle_user_activated(self, message=None):
         # first check the plugin setup mode
         if self.plugin_setup_mode == 1:
             self.plugin_setup_mode = 0
-            self.plugin_setup_configuration["plugin_setup_mode"] = self.plugin_setup_mode
-            self.plugin_setup_configuration.store()
             self.start_internet_check()
         else:
             # Assume the user wants to run the setup process manually
