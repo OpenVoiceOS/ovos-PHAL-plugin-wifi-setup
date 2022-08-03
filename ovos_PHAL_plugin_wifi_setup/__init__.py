@@ -1,3 +1,4 @@
+from operator import sub
 import subprocess
 import random
 import uuid
@@ -340,6 +341,13 @@ class WifiSetupPlugin(PHALPlugin):
             LOG.info("Wifi watchdog started")
             output = subprocess.check_output("nmcli connection show",
                                              shell=True).decode("utf-8")
+            active_output = subprocess.check_output("nmcli -f STATE,TYPE connection show --active",
+                                                    shell=True).decode("utf-8")
+            
+            if "activated" in active_output:
+                LOG.info("Network is active")
+                self.handle_internet_connected()
+            
             if "wifi" in output:
                 LOG.info("Detected previously configured wifi, starting "
                          "grace period to allow it to connect")
