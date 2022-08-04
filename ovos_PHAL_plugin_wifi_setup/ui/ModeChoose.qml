@@ -69,6 +69,7 @@ Rectangle {
                     anchors.fill: parent
 
                     onClicked: {
+                        Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
                         Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.client.select", {"client": model.client, "id": model.id})
                     }
 
@@ -198,6 +199,7 @@ Rectangle {
             }
 
             onClicked: {
+                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
                 Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.skip.setup", {})
             }
         }
