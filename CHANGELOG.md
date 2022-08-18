@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a2...HEAD)
+
+**Merged pull requests:**
+
+- fix internet ready check [\#3](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/3) ([AIIX](https://github.com/AIIX))
+
+## [V1.0.0a2](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a2) (2022-08-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a1...V1.0.0a2)
+
 ## [V1.0.0a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a1) (2022-08-10)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/830f12a7d6ce165bd9e697db9a19739673c844bb...V1.0.0a1)
