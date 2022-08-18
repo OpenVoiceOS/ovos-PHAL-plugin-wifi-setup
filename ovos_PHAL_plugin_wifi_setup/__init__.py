@@ -432,7 +432,8 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_ready_check(self, message=None):
         """ Check if internet is ready """
-        self.bus.emit(message.response({"status": is_connected()}))
+        self.bus.emit(message.response({
+            "status": self.plugin_setup_mode == 1 or is_connected()}))
 
     def stop_setup(self):
         self.gui.release()
