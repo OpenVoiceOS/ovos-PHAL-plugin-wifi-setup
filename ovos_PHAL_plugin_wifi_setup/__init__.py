@@ -152,6 +152,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.emit(Message("ovos.phal.wifi.plugin.alive"))
         # Also let the clients ask if the plugin is alive 
         self.bus.on("ovos.phal.wifi.plugin.status", self.handle_status_request)
+
+        # Check if internet is ready for mycroft_ready
+        self.bus.on("mycroft.internet.is_ready", self.handle_ready_check)
         
         self.enclosure = EnclosureAPI(bus=self.bus, skill_id=self.name)
         self.start_internet_check()
@@ -426,6 +429,10 @@ class WifiSetupPlugin(PHALPlugin):
         # We don't know if the user has configured setup, so we'll just emit a message for setup skill
         self.bus.emit(Message("ovos.wifi.setup.completed"))        
         self.stop_setup()  # just in case
+
+    def handle_ready_check(self, message=None):
+        """ Check if internet is ready """
+        self.bus.emit(message.response({"status": is_connected()}))
 
     def stop_setup(self):
         self.gui.release()
