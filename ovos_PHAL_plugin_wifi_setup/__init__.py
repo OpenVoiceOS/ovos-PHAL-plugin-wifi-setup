@@ -298,7 +298,7 @@ class WifiSetupPlugin(PHALPlugin):
         page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
-        self.gui.show_page(page, override_animations=True, override_idle=True)
+        self.gui.show_page(page, override_animations=True)
         
     def handle_skip_setup(self, message=None):
         self.in_setup = False
@@ -432,7 +432,8 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_ready_check(self, message=None):
         """ Check if internet is ready """
-        self.bus.emit(message.response({"status": self.plugin_setup_mode == 1 or is_connected()}))
+        self.bus.emit(message.response({
+            "status": self.plugin_setup_mode == 1 or is_connected()}))
 
     def stop_setup(self):
         self.gui.release()
