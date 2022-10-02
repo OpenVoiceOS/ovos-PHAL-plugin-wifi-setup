@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a3...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a4...HEAD)
+
+**Closed issues:**
+
+- missing readme [\#6](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/issues/6)
+
+**Merged pull requests:**
+
+- Update PyPI Action name and action spec [\#5](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/5) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.0.0a4](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a4) (2022-08-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a3...V1.0.0a4)
 
 **Fixed bugs:**
 
