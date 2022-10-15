@@ -1,18 +1,19 @@
-from operator import sub
 import subprocess
 import random
+import subprocess
 import uuid
 from os.path import dirname, join
 from time import sleep
 
-from mycroft_bus_client.message import Message
+from mycroft_bus_client.message import Message, dig_for_message
 from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
-from ovos_utils.enclosure.api import EnclosureAPI
-from ovos_utils.gui import GUIInterface, is_gui_connected
+from ovos_utils.gui import GUIInterface
+from ovos_utils.gui import is_gui_connected
 from ovos_utils.log import LOG
-from ovos_utils.network_utils import is_connected
+from ovos_utils.network_utils import is_connected, get_ip
+
 
 # Event Documentation
 # ===================
@@ -106,7 +107,7 @@ class WifiSetupPlugin(PHALPlugin):
         self.monitoring = False
         self.in_setup = False
         self.client_in_setup = False
-        
+
         self.connected = False
         self.grace_period = 45
         self.time_between_checks = 30
@@ -117,12 +118,12 @@ class WifiSetupPlugin(PHALPlugin):
         self.active_client_id = None
         self.registered_clients = []
         self.gui = GUIInterface(bus=self.bus, skill_id=self.name)
-        
+
         # 0 = Normal Operation, 1 = Skipped (User selected to skip setup)
         # if the user selected to skip setup, we will not start the setup process or check for internet, etc.
         # until the user explicitly tells us to start the setup process again either through VUI or GUI interaction
         self.plugin_setup_mode = 0
-        
+
         # Manage client registration, activation and deactivation
         # Multiple clients can be registered, but only one can be active at a time
         self.bus.on("ovos.phal.wifi.plugin.register.client", self.handle_register_client)
@@ -130,24 +131,23 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.on("ovos.phal.wifi.plugin.get.registered.clients", self.handle_get_registered_clients)
         self.bus.on("ovos.phal.wifi.plugin.set.active.client", self.handle_set_active_client)
         self.bus.on("ovos.phal.wifi.plugin.remove.active.client", self.handle_remove_active_client)
-        
+
         # Manage when the client is in setup and out of setup
         self.bus.on("ovos.phal.wifi.plugin.client.setup.failure", self.handle_client_setup_failure)
-        
+
         # GUI event to handle client selection
         # Client selection is presented to the user in the GUI if GUI and touch/mouse are available
         self.bus.on("ovos.phal.wifi.plugin.client.select", self.handle_client_select)
         self.bus.on("ovos.phal.wifi.plugin.skip.setup", self.handle_skip_setup)
         self.bus.on("ovos.phal.wifi.plugin.client.select.page.removed", self.handle_setup_page_removed)
-    
+
         # GUI event to handle user activation of plugin (user selected the plugin in the GUI)
         # or via voice command (user activated the plugin via voice command)
         self.bus.on("ovos.phal.wifi.plugin.user.activated", self.handle_user_activated)
-    
-        
+
         # Handle Internet Connected Event
         self.bus.on("mycroft.internet.connected", self.handle_internet_connected)
-                
+
         # When the plugin comes online, we need to emit a message so clients can register
         self.bus.emit(Message("ovos.phal.wifi.plugin.alive"))
         # Also let the clients ask if the plugin is alive 
@@ -155,37 +155,37 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Check if internet is ready for mycroft_ready
         self.bus.on("mycroft.internet.is_ready", self.handle_ready_check)
-        
-        self.enclosure = EnclosureAPI(bus=self.bus, skill_id=self.name)
+
+        self._init_gui_client()
         self.start_internet_check()
-    
+
     # Generic Status Check
     ############################################################################
-
     def handle_status_request(self, message=None):
         # Check if the plugin is loaded and running
         if self.monitoring:
             self.bus.emit(Message("ovos.phal.wifi.plugin.alive"))
-    
+
     # Client Registeration, De-Registration, Activation and Deactivation Section
     ############################################################################
-       
     def handle_register_client(self, message=None):
         client_plugin_name = message.data.get("client", "")
         client_plugin_type = message.data.get("type", "")
         client_plugin_display_text = message.data.get("display_text", "")
         client_plugin_has_gui = message.data.get("has_gui", False)
         client_plugin_requires_input = message.data.get("requires_input", False)
-        
+
         # Fist make sure the required parameters are present
         if not client_plugin_name or not client_plugin_type or not client_plugin_display_text:
-            self.bus.emit(Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+            self.bus.emit(
+                Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
             return
-        
+
         if not client_plugin_has_gui and not client_plugin_requires_input:
-            self.bus.emit(Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+            self.bus.emit(
+                Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
             return
-        
+
         # Use the client plugin id for activation and deactivation rather than depending on parameters in the message
         random_uuid = str(uuid.uuid4())
         client_plugin_id = client_plugin_name[-2:] + client_plugin_type[-2:] + str(
@@ -194,8 +194,8 @@ class WifiSetupPlugin(PHALPlugin):
         # First check if we already have this client registered, if not, add it
         if client_plugin_name not in self.registered_clients:
             self.registered_clients.append({
-                "client": client_plugin_name, 
-                "type": client_plugin_type, 
+                "client": client_plugin_name,
+                "type": client_plugin_type,
                 "display_text": client_plugin_display_text,
                 "has_gui": client_plugin_has_gui,
                 "requires_input": client_plugin_requires_input,
@@ -203,18 +203,18 @@ class WifiSetupPlugin(PHALPlugin):
             })
             # Emit a message if the client has been registered
             self.bus.emit(Message("ovos.phal.wifi.plugin.client.registered", {
-                "client": client_plugin_name, 
-                "type": client_plugin_type, 
+                "client": client_plugin_name,
+                "type": client_plugin_type,
                 "display_text": client_plugin_display_text,
                 "has_gui": client_plugin_has_gui,
                 "requires_input": client_plugin_requires_input,
                 "id": client_plugin_id
             }))
             LOG.info("Registered wifi client: " + client_plugin_name)
-    
+
     def handle_deregister_client(self, message=None):
         client_plugin_name = message.data.get("client", "")
-        
+
         for client in self.registered_clients:
             # If the client is found, remove the dictionary entry from the list
             # and emit a message to the client that it has been deregistered
@@ -224,7 +224,7 @@ class WifiSetupPlugin(PHALPlugin):
                     "client": client_plugin_name
                 }))
                 return
-            
+
     def handle_get_registered_clients(self, message=None):
         self.bus.emit(Message("ovos.phal.wifi.plugin.registered.clients", {
             "clients": self.registered_clients
@@ -233,7 +233,7 @@ class WifiSetupPlugin(PHALPlugin):
     def handle_set_active_client(self, message=None):
         set_client = message.data.get("client", "")
         set_client_id = message.data.get("id", "")
-        
+
         # First make sure the client is registered
         for client in self.registered_clients:
             if client["client"] == set_client:
@@ -245,7 +245,7 @@ class WifiSetupPlugin(PHALPlugin):
                     self.bus.emit(Message(f"ovos.phal.wifi.plugin.activate.{set_client_id}"))
                 else:
                     LOG.error("No client id found to activate")
-                
+
                 # Release the gui once the client is set so client can take control of the gui
                 self.gui.release()
                 self.in_setup = False
@@ -253,65 +253,63 @@ class WifiSetupPlugin(PHALPlugin):
     def handle_remove_active_client(self, message=None):
         if self.active_client is not None:
             self.active_client = None
-        if self.active_client_id is not None:    
+        if self.active_client_id is not None:
             self.bus.emit(Message(f"ovos.phal.wifi.plugin.deactivate.{self.active_client_id}"))
             self.active_client_id = None
         self.client_in_setup = False
-    
+
     # Client Setup Control Section
     ############################################################################
-            
     def handle_client_setup_failure(self, message=None):
         if self.active_client is not None:
             self.active_client = None
-        if self.active_client_id is not None:    
+        if self.active_client_id is not None:
             self.bus.emit(Message(f"ovos.phal.wifi.plugin.deactivate.{self.active_client_id}"))
             self.active_client_id = None
         self.client_in_setup = False
 
     # Client Selection Section And GUI (Path only active if GUI and touch/mouse are available)
     ############################################################################
-    
     def handle_client_select(self, message=None):
         # If the client is in setup, do not allow the user to select a client
         if self.client_in_setup:
             return
-        
+
         # If the client is not in setup, and the client is not active, we can select a client
         if self.active_client is None:
             user_requested_client = message.data.get("client", "")
             user_requested_id = message.data.get("id", "")
             LOG.info("User requested client {0}".format(user_requested_client))
-            
+
             for client in self.registered_clients:
                 if client["client"] == user_requested_client:
-                    self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", { 
-                        "client": user_requested_client, 
+                    self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", {
+                        "client": user_requested_client,
                         "id": user_requested_id
                     }))
                     return
         self.in_setup = False
-    
+
     def display_client_select(self, message=None):
-        self.in_setup = True       
+        self.in_setup = True
         self.gui.clear()
         page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
         self.gui.show_page(page, override_animations=True)
-        
+
     def handle_skip_setup(self, message=None):
         self.in_setup = False
         self.client_in_setup = False
         self.active_client = None
         self.active_client_id = None
-        
+
         # Deactivate the running watchdog daemon
         self.monitoring = False
-        
+
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
-        
+
     def handle_user_activated(self, message=None):
         # first check the plugin setup mode
         if self.plugin_setup_mode == 1:
@@ -320,37 +318,38 @@ class WifiSetupPlugin(PHALPlugin):
         else:
             # Assume the user wants to run the setup process manually
             self.launch_networking_setup()
-            
+
     def handle_setup_page_removed(self, message=None):
         LOG.debug("Mode Select Page Removed")
         self.in_setup = False
-        
+
     # Internet Check and Watchdog Section
     ############################################################################
-        
     def start_internet_check(self):
         # Check the plugin setup mode to see if we should start the internet check
         if self.plugin_setup_mode == 0:
             create_daemon(self._watchdog)
         else:
             LOG.info("Internet check disabled by user")
-        
+
     def stop_internet_check(self):
         self.monitoring = False
-        
+
     def _watchdog(self):
         try:
             self.monitoring = True
             LOG.info("Wifi watchdog started")
+            # TODO - remove dependency on nmcli
+            # accept command from config to support alternate libs?
             output = subprocess.check_output("nmcli connection show",
                                              shell=True).decode("utf-8")
             active_output = subprocess.check_output("nmcli -f STATE,TYPE connection show --active",
                                                     shell=True).decode("utf-8")
-            
+
             if "activated" in active_output:
                 LOG.info("Network is active")
                 self.handle_internet_connected()
-            
+
             if "wifi" in output:
                 LOG.info("Detected previously configured wifi, starting "
                          "grace period to allow it to connect")
@@ -390,10 +389,10 @@ class WifiSetupPlugin(PHALPlugin):
     @staticmethod
     def is_connected_to_wifi():
         return WifiSetupPlugin.get_wifi_ssid() is not None
-    
+
     def launch_networking_setup(self):
         self.bus.emit(Message("ovos.phal.wifi.plugin.setup.launched"))
-        
+
         try:
             if is_gui_connected(self.bus) and can_use_touch_mouse():
                 LOG.debug("GUI / INPUT DETECTED LAUNCHING GUI")
@@ -403,16 +402,16 @@ class WifiSetupPlugin(PHALPlugin):
                 # If we do find a registered client that has requires_input set to false, we can use it
                 # example (balena-wifi-setup)
                 LOG.debug("LAUNCHING NON INPUT INTERACTIVE SETUP")
-                
+
                 # First check if there are any clients registered at all
                 if len(self.registered_clients) == 0:
                     LOG.error("No clients registered")
-                
+
                 # Check if there are any clients that do not require input
                 for client in self.registered_clients:
                     if not client["requires_input"]:
-                        self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", { 
-                            "client": client["client"], 
+                        self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", {
+                            "client": client["client"],
                             "id": client["id"]
                         }))
                         return
@@ -423,11 +422,10 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_internet_connected(self, message=None):
         """System came online later after booting."""
-        self.enclosure.mouth_reset()
         # sync clock as soon as we have internet
         self.bus.emit(Message("system.ntp.sync"))
         # We don't know if the user has configured setup, so we'll just emit a message for setup skill
-        self.bus.emit(Message("ovos.wifi.setup.completed"))        
+        self.bus.emit(Message("ovos.wifi.setup.completed"))
         self.stop_setup()  # just in case
 
     def handle_ready_check(self, message=None):
@@ -435,7 +433,191 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.emit(message.response({
             "status": self.plugin_setup_mode == 1 or is_connected()}))
 
+    # GUI client logic - register a GUI interface as a wifi setup handler
+    def _init_gui_client(self):
+        # GUI handling
+        self.connected_network = None
+        self.gui_client_active = False
+        self.client_id = None
+        self.gui_registered = False
+
+        # WIFI Plugin Registeration and Activation Specific Events
+        self.bus.on("ovos.phal.wifi.plugin.stop.setup.event", self.handle_stop_gui_setup)
+        self.bus.on("ovos.phal.wifi.plugin.client.registered", self.handle_gui_registered)
+        self.bus.on("ovos.phal.wifi.plugin.client.deregistered", self.handle_gui_deregistered)
+        self.bus.on("ovos.phal.wifi.plugin.client.registration.failure", self.handle_gui_registration_failure)
+        self.bus.on("ovos.phal.wifi.plugin.alive", self.register_gui_client)
+
+        # OVOS PHAL NM EVENTS
+        self.bus.on("ovos.phal.nm.connection.successful", self.display_success)
+        self.bus.on("ovos.phal.nm.connection.failure", self.display_failure)
+
+        # INTERNAL GUI EVENTS
+        self.bus.on("ovos.phal.gui.network.client.back",
+                    self.display_path_exit)
+        self.bus.on("ovos.phal.gui.display.connected.network.settings",
+                    self.display_connected_network_settings)
+        self.bus.on("ovos.phal.gui.display.disconnected.network.settings",
+                    self.display_disconnected_network_settings)
+        self.bus.on("ovos.phal.gui.network.client.internal.back",
+                    self.display_internal_back)
+
+        # Also listen for certain events that can forcefully deactivate the client
+        self.bus.on("system.display.homescreen", self.gui_shutdown)
+        self.bus.on("mycroft.device.settings", self.gui_shutdown)
+
+        # Try Register the Client with WIFI Plugin on Startup
+        self.register_gui_client()
+
+    def register_gui_client(self, message=None):
+        self.bus.emit(Message("ovos.phal.wifi.plugin.register.client", {
+            "client": self.name,
+            "type": "onDevice",
+            "display_text": "On Device Setup",
+            "has_gui": True,
+            "requires_input": True
+        }))
+
+    def handle_gui_registered(self, message=None):
+        get_client = message.data.get("client", "")
+        if get_client == self.name:
+            get_id = message.data.get("id", "")
+            self.client_id = get_id
+            self.gui_registered = True
+            self.bus.on(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_activate_gui_client_request)
+            self.bus.on(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}", self.handle_deactivate_gui_client_request)
+            LOG.info(f"Client Registered with WIFI Plugin: {self.client_id}")
+
+    def handle_gui_deregistered(self, message=None):
+        self.gui_registered = False
+        self.bus.remove(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_active_client_request)
+        self.bus.remove(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}", self.handle_deactivate_gui_client_request)
+        self.client_id = None
+
+    def handle_gui_registration_failure(self, message=None):
+        if not self.gui_registered:
+            error = message.data.get("error", "")
+            LOG.info(f"Registration Failure: {error}")
+            # Try to Register the Client with WIFI Plugin Again
+            self.register_gui_client()
+
+    def handle_activate_gui_client_request(self, message=None):
+        LOG.info("Gui Network Client Plugin Activated")
+        if self.gui_client_active:
+            self.request_gui_deactivate()
+        self.gui_client_active = True
+        self.display_network_setup()
+
+    def handle_deactivate_gui_client_request(self, message=None):
+        LOG.info("Gui Network Client Plugin Deactivated")
+        self.gui_client_active = False
+        self.gui.release()
+
+    def request_gui_deactivate(self, message=None):
+        self.bus.emit(Message("ovos.phal.wifi.plugin.remove.active.client", {
+            "client": "ovos-PHAL-plugin-gui-network-client"}))
+        LOG.info("Gui Network Client Plugin Deactivation Requested")
+
+    def gui_shutdown(self, message=None):
+        if self.gui_client_active:
+            self.request_gui_deactivate()
+            self.gui.release()
+
+    # Actual GUI Networking Operations
+    def display_network_setup(self, message=None):
+        LOG.info("In Display Network Setup")
+        self.manage_setup_display("select-network", "network")
+
+    def display_path_exit(self, message=None):
+        self.gui_client_active = False
+        self.request_gui_deactivate()
+
+        if not is_connected():
+            self.bus.emit(Message("ovos.phal.wifi.plugin.user.activated"))
+        else:
+            self.gui.release()
+
+    def display_connected_network_settings(self, message=None):
+        self.connected_network_details = message.data.get("connection_details", {})
+        self.gui["connectionDetails"] = self.connected_network_details
+        self.gui["ipAddress"] = get_ip()
+        self.manage_setup_display("connected-network-settings", "network")
+
+    def display_disconnected_network_settings(self, message=None):
+        self.disconnected_network_details = message.data.get("connection_details", {})
+        self.gui["connectionDetails"] = self.disconnected_network_details
+        self.manage_setup_display("disconnected-network-settings", "network")
+
+    def display_internal_back(self, message=None):
+        self.manage_setup_display("select-network", "network")
+
+    def display_success(self, message=None):
+        self.manage_setup_display("setup-completed", "status")
+        sleep(5)
+        self.bus.emit(Message("ovos.wifi.setup.completed"))
+        self.gui_client_active = False
+        self.request_gui_deactivate()
+
+    def display_failure(self, message=None):
+        """Wifi setup failed"""
+        errorCode = message.data.get("errorCode", "")
+        if errorCode == "0":
+            self.display_failed_password()
+        else:
+            self.manage_setup_display("setup-failed", "status")
+            self.speak_dialog("debug_wifi_error")
+            sleep(5)
+            self.display_network_setup()
+
+    def display_failed_password(self):
+        self.manage_setup_display("incorrect-password", "status")
+        self.speak_dialog("debug_wifi_error")
+        sleep(5)
+        self.display_network_setup()
+
+    def manage_setup_display(self, state, page_type):
+        self.log.info("In Displaying Page Function")
+        page = join(dirname(__file__), "ui", "GuiClientLoader.qml")
+        if state == "select-network" and page_type == "network":
+            self.gui["page_type"] = "NetworkingLoader"
+            self.gui["image"] = ""
+            self.gui["label"] = ""
+            self.gui["color"] = ""
+            self.gui.show_page(page, override_idle=True,
+                               override_animations=True)
+        elif state == "connected-network-settings" and page_type == "network":
+            self.gui["page_type"] = "ManageConnectedNetwork"
+            self.gui.show_page(page, override_idle=True,
+                               override_animations=True)
+        elif state == "disconnected-network-settings" and page_type == "network":
+            self.gui["page_type"] = "ManageUnconnectedNetwork"
+            self.gui.show_page(page, override_idle=True,
+                               override_animations=True)
+        elif state == "setup-completed" and page_type == "status":
+            self.gui["page_type"] = "Status"
+            self.gui["image"] = "icons/check-circle.svg"
+            self.gui["label"] = "Connected"
+            self.gui["color"] = "#40DBB0"
+            self.gui.show_page(page, override_animations=True)
+        elif state == "setup-failed" and page_type == "status":
+            self.gui["page_type"] = "Status"
+            self.gui["image"] = "icons/times-circle.svg"
+            self.gui["label"] = "Connection Failed"
+            self.gui["color"] = "#FF0000"
+            self.gui.show_page(page, override_animations=True)
+        elif state == "incorrect-password" and page_type == "status":
+            self.gui["page_type"] = "Status"
+            self.gui["image"] = "icons/times-circle.svg"
+            self.gui["label"] = "Incorrect Password"
+            self.gui["color"] = "#FF0000"
+            self.gui.show_page(page, override_animations=True)
+
+    def handle_stop_gui_setup(self, message=None):
+        self.request_gui_deactivate()
+
+    # Stop handling logic
     def stop_setup(self):
+        self.request_gui_deactivate()
         self.gui.release()
         self.bus.emit(Message("ovos.phal.wifi.plugin.stop.setup.event"))
         self.in_setup = False
@@ -445,3 +627,35 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.remove("mycroft.internet.connected", self.handle_internet_connected)
         self.stop_setup()
         super().shutdown()
+
+    # speech - TODO move this out of here,
+    #  should have speak_dialog in a single place and import, not duplicate code
+    @property
+    def lang(self):
+        return self.config.get("lang") or \
+               self.config_core.get("lang") or \
+               "en-us"
+
+    def speak_dialog(self, key):
+        """ Speak a random sentence from a dialog file.
+        Args:
+            key (str): dialog file key (e.g. "hello" to speak from the file
+                                        "locale/en-us/hello.dialog")
+        """
+        dialog_file = join(dirname(__file__), "locale",
+                           self.lang, key + ".dialog")
+        with open(dialog_file) as f:
+            utterances = [u for u in f.read().split("\n")
+                          if u.strip() and not u.startswith("#")]
+        utterance = random.choice(utterances)
+        meta = {'dialog': key,
+                'skill': self.name}
+        data = {'utterance': utterance,
+                'expect_response': False,
+                'meta': meta,
+                'lang': self.lang}
+        message = dig_for_message()
+        m = message.forward(
+            "speak", data) if message else Message("speak", data)
+        m.context["skill_id"] = self.name
+        self.bus.emit(m)
