@@ -437,8 +437,9 @@ class WifiSetupPlugin(PHALPlugin):
     def _init_gui_client(self):
         # GUI handling
         self.connected_network = None
+        self.gui_client_name = self.name + "-gui"
         self.gui_client_active = False
-        self.client_id = None
+        self.gui_client_id = None
         self.gui_registered = False
 
         # WIFI Plugin Registeration and Activation Specific Events
@@ -471,7 +472,7 @@ class WifiSetupPlugin(PHALPlugin):
 
     def register_gui_client(self, message=None):
         self.bus.emit(Message("ovos.phal.wifi.plugin.register.client", {
-            "client": self.name,
+            "client": self.gui_client_name,
             "type": "onDevice",
             "display_text": "On Device Setup",
             "has_gui": True,
@@ -480,19 +481,19 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_gui_registered(self, message=None):
         get_client = message.data.get("client", "")
-        if get_client == self.name:
+        if get_client == self.gui_client_name:
             get_id = message.data.get("id", "")
-            self.client_id = get_id
+            self.gui_client_id = get_id
             self.gui_registered = True
-            self.bus.on(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_activate_gui_client_request)
-            self.bus.on(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}", self.handle_deactivate_gui_client_request)
-            LOG.info(f"Client Registered with WIFI Plugin: {self.client_id}")
+            self.bus.on(f"ovos.phal.wifi.plugin.activate.{self.gui_client_id}", self.handle_activate_gui_client_request)
+            self.bus.on(f"ovos.phal.wifi.plugin.deactivate.{self.gui_client_id}", self.handle_deactivate_gui_client_request)
+            LOG.info(f"Client Registered with WIFI Plugin: {self.gui_client_id}")
 
     def handle_gui_deregistered(self, message=None):
         self.gui_registered = False
-        self.bus.remove(f"ovos.phal.wifi.plugin.activate.{self.client_id}", self.handle_active_client_request)
-        self.bus.remove(f"ovos.phal.wifi.plugin.deactivate.{self.client_id}", self.handle_deactivate_gui_client_request)
-        self.client_id = None
+        self.bus.remove(f"ovos.phal.wifi.plugin.activate.{self.gui_client_id}", self.handle_active_client_request)
+        self.bus.remove(f"ovos.phal.wifi.plugin.deactivate.{self.gui_client_id}", self.handle_deactivate_gui_client_request)
+        self.gui_client_id = None
 
     def handle_gui_registration_failure(self, message=None):
         if not self.gui_registered:
@@ -514,8 +515,8 @@ class WifiSetupPlugin(PHALPlugin):
         self.gui.release()
 
     def request_gui_deactivate(self, message=None):
-        self.bus.emit(Message("ovos.phal.wifi.plugin.remove.active.client", {
-            "client": "ovos-PHAL-plugin-gui-network-client"}))
+        self.bus.emit(Message("ovos.phal.wifi.plugin.remove.active.client",
+                              {"client": self.gui_client_name}))
         LOG.info("Gui Network Client Plugin Deactivation Requested")
 
     def gui_shutdown(self, message=None):
@@ -538,8 +539,8 @@ class WifiSetupPlugin(PHALPlugin):
             self.gui.release()
 
     def display_connected_network_settings(self, message=None):
-        self.connected_network_details = message.data.get("connection_details", {})
-        self.gui["connectionDetails"] = self.connected_network_details
+        self.connected_network = message.data.get("connection_details", {})
+        self.gui["connectionDetails"] = self.connected_network
         self.gui["ipAddress"] = get_ip()
         self.manage_setup_display("connected-network-settings", "network")
 
