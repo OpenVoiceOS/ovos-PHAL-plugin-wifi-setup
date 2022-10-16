@@ -14,6 +14,7 @@ from ovos_utils.gui import (GUIInterface,
                             is_gui_running, is_gui_connected)
 from ovos_utils.log import LOG
 from ovos_utils.network_utils import is_connected
+from ovos_config.config import update_mycroft_config
 
 # Event Documentation
 # ===================
@@ -118,6 +119,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.active_client_id = None
         self.registered_clients = []
         self.gui = GUIInterface(bus=self.bus, skill_id=self.name)
+        self.config_group = self.config.get("networking", {})
+        self.first_boot = self.config_group.get("first_boot", True)
+        self.enable_watchdog = self.config_group.get("enable_watchdog", True)
 
         # 0 = Normal Operation, 1 = Skipped (User selected to skip setup)
         # if the user selected to skip setup, we will not start the setup process or check for internet, etc.
@@ -299,8 +303,11 @@ class WifiSetupPlugin(PHALPlugin):
         page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
-        self.gui.show_page(page, override_animations=True)
-
+        if self.first_boot:
+            self.gui.show_page(page, override_idle=True, override_animations=True)
+        else:
+            self.gui.show_page(page, override_animations=True)
+        
     def handle_skip_setup(self, message=None):
         self.in_setup = False
         self.client_in_setup = False
@@ -310,10 +317,16 @@ class WifiSetupPlugin(PHALPlugin):
         # Deactivate the running watchdog daemon
         self.monitoring = False
 
+        # Disable watchdog from running on boot
+        update_mycroft_config({"networking": {"enable_watchdog": False}})
+
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
 
     def handle_user_activated(self, message=None):
+        # enable the watchdog if user activated the service manually
+        update_mycroft_config({"networking": {"enable_watchdog": True}})
+
         # first check the plugin setup mode
         if self.plugin_setup_mode == 1:
             self.plugin_setup_mode = 0
@@ -331,11 +344,14 @@ class WifiSetupPlugin(PHALPlugin):
 
     def start_internet_check(self):
         # Check the plugin setup mode to see if we should start the internet check
-        if self.plugin_setup_mode == 0:
-            create_daemon(self._watchdog)
+        if self.enable_watchdog:
+            if self.plugin_setup_mode == 0:
+                create_daemon(self._watchdog)
+            else:
+                LOG.info("Internet check disabled by user")
         else:
-            LOG.info("Internet check disabled by user")
-
+            LOG.info("Internet check disabled by skip network setup")
+        
     def stop_internet_check(self):
         self.monitoring = False
 
@@ -440,6 +456,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.gui.release()
         self.bus.emit(Message("ovos.phal.wifi.plugin.stop.setup.event"))
         self.in_setup = False
+
+        # Disable first boot once setup is asked to stop
+        update_mycroft_config({"networking": {"first_boot": False}})
 
     def shutdown(self):
         self.monitoring = False
