@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a5...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a6...HEAD)
+
+**Merged pull requests:**
+
+- add qml translations [\#9](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/9) ([emphasize](https://github.com/emphasize))
+
+## [V1.0.0a6](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a6) (2022-10-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a5...V1.0.0a6)
 
 **Closed issues:**
 
