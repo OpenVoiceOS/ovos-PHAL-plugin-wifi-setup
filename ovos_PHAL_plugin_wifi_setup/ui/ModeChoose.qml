@@ -31,7 +31,7 @@ Rectangle {
 
         Label {
             id: headerAreaLabel
-            text: "Setup Networking"
+            text: qstr("Setup Networking")
             anchors.fill: parent
             anchors.margins: Kirigami.Units.largeSpacing
             verticalAlignment: Text.AlignVCenter
@@ -166,7 +166,7 @@ Rectangle {
 
                     Label {
                         id: onDisplayIconLabel
-                        text: "Skip Setup"                        
+                        text: qstr("Skip Setup")                        
                         Layout.preferredWidth: parent.width - parent.height * 0.8
                         Layout.fillHeight: true                        
                         verticalAlignment: Text.AlignVCenter
