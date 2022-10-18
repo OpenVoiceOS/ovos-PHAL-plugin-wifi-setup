@@ -323,10 +323,8 @@ class WifiSetupPlugin(PHALPlugin):
         page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
-        if self.first_boot:
-            self.gui.show_page(page, override_idle=True, override_animations=True)
-        else:
-            self.gui.show_page(page, override_animations=True)
+        self.gui.show_page(page, override_idle=self.first_boot,
+                           override_animations=True)
         
     def handle_skip_setup(self, message=None):
         self.in_setup = False
