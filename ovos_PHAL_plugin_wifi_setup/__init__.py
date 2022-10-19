@@ -144,6 +144,7 @@ class WifiSetupPlugin(PHALPlugin):
         # Client selection is presented to the user in the GUI if GUI and touch/mouse are available
         self.bus.on("ovos.phal.wifi.plugin.client.select", self.handle_client_select)
         self.bus.on("ovos.phal.wifi.plugin.skip.setup", self.handle_skip_setup)
+        self.bus.on("ovos.phal.wifi.plugin.fully.offline", self.handle_fully_offline)
         self.bus.on("ovos.phal.wifi.plugin.client.select.page.removed", self.handle_setup_page_removed)
 
         # GUI event to handle user activation of plugin (user selected the plugin in the GUI)
@@ -339,9 +340,18 @@ class WifiSetupPlugin(PHALPlugin):
         # TODO - separate skip setup into 2
         # - run fully offline -> disable watchdog (this change)
         # - handle wifi setup later (previous skip button behavior)
-        self.enable_watchdog = False
+        # self.enable_watchdog = False
 
         # set the plugin setup mode to 1 (skip setup)
+        self.plugin_setup_mode = 1
+
+    def handle_fully_offline(self, message=None):
+        self.in_setup = False
+        self.client_in_setup = False
+        self.active_client = None
+        self.active_client_id = None
+        self.monitoring = False
+        self.enable_watchdog = False
         self.plugin_setup_mode = 1
 
     def handle_user_activated(self, message=None):
