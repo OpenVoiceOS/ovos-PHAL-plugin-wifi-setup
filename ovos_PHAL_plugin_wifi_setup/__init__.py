@@ -336,12 +336,6 @@ class WifiSetupPlugin(PHALPlugin):
         # Deactivate the running watchdog daemon
         self.monitoring = False
 
-        # Disable watchdog from running on boot
-        # TODO - separate skip setup into 2
-        # - run fully offline -> disable watchdog (this change)
-        # - handle wifi setup later (previous skip button behavior)
-        # self.enable_watchdog = False
-
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
 
