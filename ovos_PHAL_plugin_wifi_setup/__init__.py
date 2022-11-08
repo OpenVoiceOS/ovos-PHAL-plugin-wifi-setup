@@ -10,7 +10,7 @@ from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
 from ovos_utils.enclosure.api import EnclosureAPI
-from ovos_utils.gui import GUIInterface, is_gui_connected
+from ovos_utils.gui import GUIInterface, is_gui_running
 from ovos_utils.log import LOG
 from ovos_utils.network_utils import is_connected
 
@@ -395,7 +395,7 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.emit(Message("ovos.phal.wifi.plugin.setup.launched"))
         
         try:
-            if is_gui_connected(self.bus) and can_use_touch_mouse():
+            if is_gui_running() and can_use_touch_mouse():
                 LOG.debug("GUI / INPUT DETECTED LAUNCHING GUI")
                 self.display_client_select()
             else:
