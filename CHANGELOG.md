@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a6...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a7...HEAD)
+
+**Merged pull requests:**
+
+- check if gui is running instead of connected [\#10](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/10) ([AIIX](https://github.com/AIIX))
+
+## [V1.0.0a7](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a7) (2022-10-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a6...V1.0.0a7)
 
 **Merged pull requests:**
 
