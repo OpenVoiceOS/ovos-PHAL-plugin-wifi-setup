@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a7...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a8...HEAD)
+
+**Merged pull requests:**
+
+- Fix syntax error on skip button [\#11](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/11) ([AIIX](https://github.com/AIIX))
+
+## [V1.0.0a8](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a8) (2022-11-08)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a7...V1.0.0a8)
 
 **Merged pull requests:**
 
