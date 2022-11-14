@@ -166,7 +166,7 @@ Rectangle {
 
                     Label {
                         id: onDisplayIconLabel
-                        text: qstr("Skip Setup")                        
+                        text: qsTr("Skip Setup")
                         Layout.preferredWidth: parent.width - parent.height * 0.8
                         Layout.fillHeight: true                        
                         verticalAlignment: Text.AlignVCenter
