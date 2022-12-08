@@ -348,6 +348,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.enable_watchdog = False
         self.plugin_setup_mode = 1
 
+        # First boot setup completed
+        self.first_boot = False
+
     def handle_user_activated(self, message=None):
         # enable the watchdog if user activated the service manually
         self.enable_watchdog = True
@@ -409,6 +412,9 @@ class WifiSetupPlugin(PHALPlugin):
                         LOG.info("LAUNCH SETUP")
                         try:
                             self.launch_networking_setup()  # blocking
+                            if self.first_boot:
+                                LOG.debug("First boot setup completed")
+                                self.first_boot = False
                         except Exception as e:
                             LOG.exception(e)
                     else:
