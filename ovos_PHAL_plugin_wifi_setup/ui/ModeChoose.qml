@@ -228,7 +228,7 @@ Rectangle {
 
                         Label {
                             id: onDisplayIconLabelTwo
-                            text: "Never Connect"
+                            text: qsTr("Never Connect")
                             Layout.preferredWidth: parent.width - parent.height * 0.8
                             Layout.fillHeight: true
                             verticalAlignment: Text.AlignVCenter
