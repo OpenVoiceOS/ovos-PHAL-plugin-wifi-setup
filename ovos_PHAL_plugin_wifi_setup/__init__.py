@@ -231,7 +231,8 @@ class WifiSetupPlugin(PHALPlugin):
             random.randint(0, 9)) + str(random.randint(0, 9)) + random_uuid[-1:] + random_uuid[0]
 
         # First check if we already have this client registered, if not, add it
-        if client_plugin_name not in self.registered_clients:
+        if not any((client.get('client') == client_plugin_name
+                    for client in self.registered_clients)):
             self.registered_clients.append({
                 "client": client_plugin_name,
                 "type": client_plugin_type,
@@ -352,6 +353,12 @@ class WifiSetupPlugin(PHALPlugin):
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
 
+        # Notify any listeners that we're in offline mode now
+        message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
+            Message("ovos.phal.wifi.plugin.fully_offline")
+        self.bus.emit(message)
+        self.gui.clear()
+
     def handle_fully_offline(self, message=None):
         self.in_setup = False
         self.client_in_setup = False
@@ -368,6 +375,7 @@ class WifiSetupPlugin(PHALPlugin):
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
             Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
+        self.gui.clear()
 
     def handle_user_activated(self, message=None):
         # enable the watchdog if user activated the service manually
