@@ -296,6 +296,8 @@ class WifiSetupPlugin(PHALPlugin):
         if self.active_client_id is not None:
             self.bus.emit(Message(f"ovos.phal.wifi.plugin.deactivate.{self.active_client_id}"))
             self.active_client_id = None
+            if is_connected():
+                self.bus.emit(Message("mycroft.internet.connected"))
         self.client_in_setup = False
 
     # Client Setup Control Section
@@ -446,8 +448,6 @@ class WifiSetupPlugin(PHALPlugin):
                             LOG.exception(e)
                     else:
                         LOG.warning("CONNECTED TO WIFI, BUT NO INTERNET!!")
-                    if is_connected():
-                        self.bus.emit(Message("mycroft.internet.connected"))
                 sleep(self.time_between_checks)
         except Exception as e:
             LOG.error("Wifi watchdog crashed unexpectedly")
