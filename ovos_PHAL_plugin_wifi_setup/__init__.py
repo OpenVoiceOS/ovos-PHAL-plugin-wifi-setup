@@ -17,7 +17,7 @@ from ovos_utils.network_utils import is_connected
 
 # Event Documentation
 # ===================
-# Registeration:
+# Registration:
 # ----------------
 # ovos.phal.wifi.plugin.register.client
 # type: Request
@@ -83,6 +83,10 @@ from ovos_utils.network_utils import is_connected
 # type: Request
 # description: Inform the wifi plugin that the internet is connected
 #
+# mycroft.internet.disconnected
+# type: Response
+# description: Notify watchdog detected internet disconnected
+#
 # ovos.phal.wifi.plugin.alive
 # type: Response
 # description: Inform the wifi clients that the plugin is alive on startup
@@ -90,6 +94,10 @@ from ovos_utils.network_utils import is_connected
 # ovos.phal.wifi.plugin.status
 # type: Request
 # description: Request the wifi plugin to send the status of the plugin
+#
+# ovos.phal.wifi.plugin.status.response
+# type: Response
+# description: Notify setup and watchdog status
 #
 # ovos.phal.wifi.plugin.stop.setup.event
 # type: Response
@@ -113,7 +121,7 @@ class WifiSetupPlugin(PHALPlugin):
         # it can be used to keep state
         self.settings = PrivateSettings(name)
 
-        self.connected = False
+        # self.connected = False
         self.grace_period = 45
         self.time_between_checks = 30
         self.mycroft_ready = False
@@ -166,7 +174,6 @@ class WifiSetupPlugin(PHALPlugin):
         self.enclosure = EnclosureAPI(bus=self.bus, skill_id=self.name)
         self.start_internet_check()
 
-
     @property
     def first_boot(self):
         return self.settings.get("first_boot", True)
@@ -192,6 +199,8 @@ class WifiSetupPlugin(PHALPlugin):
         # Check if the plugin is loaded and running
         if self.monitoring:
             self.bus.emit(Message("ovos.phal.wifi.plugin.alive"))
+        message.response({"watchdog_active": self.enable_watchdog,
+                          "in_setup": self.in_setup})
 
     # Client Registeration, De-Registration, Activation and Deactivation Section
     ############################################################################
@@ -407,6 +416,7 @@ class WifiSetupPlugin(PHALPlugin):
                     continue
 
                 if not is_connected():
+                    self.bus.emit(Message("mycroft.internet.disconnected"))
                     LOG.info("NO INTERNET")
                     if not self.is_connected_to_wifi():
                         LOG.info("LAUNCH SETUP")
