@@ -143,30 +143,35 @@ Rectangle {
             color: Kirigami.Theme.textColor
         }
 
-        Button {
-            id: footerAreaSkipButton
+        RowLayout {
             anchors.top: footerAreaSeparator.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.margins: Mycroft.Units.gridUnit * 1
+            spacing: Mycroft.Units.gridUnit / 3
 
-            background: Rectangle {
-                id: footerAreaSkipButtonBackground
-                color: Kirigami.Theme.backgroundColor
-                border.width: 1
-                border.color: Kirigami.Theme.textColor
-                radius: 4
-            }
+            Button {
+                id: footerAreaSkipButton
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            contentItem: Item {
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: Kirigami.Units.largeSpacing
+                background: Rectangle {
+                    id: footerAreaSkipButtonBackground
+                    color: Kirigami.Theme.backgroundColor
+                    border.width: 1
+                    border.color: Kirigami.Theme.textColor
+                    radius: 4
+                }
+
+                contentItem: Item {
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Kirigami.Units.largeSpacing
 
                     Label {
                         id: onDisplayIconLabel
-                        text: qsTr("Skip Setup")
+                        text: qsTr("Connect Later")
                         Layout.preferredWidth: parent.width - parent.height * 0.8
                         Layout.fillHeight: true                        
                         verticalAlignment: Text.AlignVCenter
@@ -178,29 +183,87 @@ Rectangle {
                         color: Kirigami.Theme.textColor
                     }
 
-                    Kirigami.Icon {
-                        source: "arrow-right"
-                        Layout.preferredWidth: parent.height * 0.8
-                        Layout.preferredHeight: parent.height * 0.8
+                        Kirigami.Icon {
+                            source: "network-mobile-off"
+                            Layout.preferredWidth: parent.height * 0.8
+                            Layout.preferredHeight: parent.height * 0.8
+                        }
                     }
                 }
-            }
 
-            onPressed: {
-                footerAreaSkipButtonBackground.color = Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.5)
-                footerAreaSkipButtonBackground.border.color = Kirigami.Theme.highlightColor
-                footerAreaSkipButton.opacity = 0.8
-            }
+                onPressed: {
+                    footerAreaSkipButtonBackground.color = Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.5)
+                    footerAreaSkipButtonBackground.border.color = Kirigami.Theme.highlightColor
+                    footerAreaSkipButton.opacity = 0.8
+                }
 
-            onReleased: {
-                footerAreaSkipButtonBackground.color = Kirigami.Theme.backgroundColor
-                footerAreaSkipButtonBackground.border.color = Kirigami.Theme.textColor
-                footerAreaSkipButton.opacity = 1
-            }
+                onReleased: {
+                    footerAreaSkipButtonBackground.color = Kirigami.Theme.backgroundColor
+                    footerAreaSkipButtonBackground.border.color = Kirigami.Theme.textColor
+                    footerAreaSkipButton.opacity = 1
+                }
 
-            onClicked: {
-                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
-                Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.skip.setup", {})
+                onClicked: {
+                    Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
+                    Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.skip.setup", {})
+                }
+            }
+            Button {
+                id: footerAreaFullyOfflineButton
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                background: Rectangle {
+                    id: footerAreaFullyOfflineButtonBackground
+                    color: Kirigami.Theme.backgroundColor
+                    border.width: 1
+                    border.color: Kirigami.Theme.textColor
+                    radius: 4
+                }
+
+                contentItem: Item {
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Kirigami.Units.largeSpacing
+
+                        Label {
+                            id: onDisplayIconLabelTwo
+                            text: qsTr("Never Connect")
+                            Layout.preferredWidth: parent.width - parent.height * 0.8
+                            Layout.fillHeight: true
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WordWrap
+                            fontSizeMode: Text.Fit
+                            minimumPixelSize: 10
+                            font.pixelSize: 32
+                            color: Kirigami.Theme.textColor
+                        }
+
+                        Kirigami.Icon {
+                            source: "network-flightmode-off"
+                            Layout.preferredWidth: parent.height * 0.8
+                            Layout.preferredHeight: parent.height * 0.8
+                        }
+                    }
+                }
+
+                onPressed: {
+                    footerAreaFullyOfflineButtonBackground.color = Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.5)
+                    footerAreaFullyOfflineButtonBackground.border.color = Kirigami.Theme.highlightColor
+                    footerAreaFullyOfflineButtonBackground.opacity = 0.8
+                }
+
+                onReleased: {
+                    footerAreaFullyOfflineButtonBackground.color = Kirigami.Theme.backgroundColor
+                    footerAreaFullyOfflineButtonBackground.border.color = Kirigami.Theme.textColor
+                    footerAreaFullyOfflineButton.opacity = 1
+                }
+
+                onClicked: {
+                    Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
+                    Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.fully.offline", {})
+                }
             }
         }
     }

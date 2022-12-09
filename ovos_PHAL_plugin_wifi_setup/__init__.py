@@ -1,4 +1,3 @@
-from operator import sub
 import subprocess
 import random
 import uuid
@@ -13,6 +12,7 @@ from ovos_utils.enclosure.api import EnclosureAPI
 from ovos_utils.gui import (GUIInterface,
                             is_gui_running, is_gui_connected)
 from ovos_utils.log import LOG
+from ovos_utils.skills.settings import PrivateSettings
 from ovos_utils.network_utils import is_connected
 
 # Event Documentation
@@ -103,10 +103,15 @@ from ovos_utils.network_utils import is_connected
 class WifiSetupPlugin(PHALPlugin):
 
     def __init__(self, bus=None, config=None):
-        super().__init__(bus=bus, name="ovos-PHAL-plugin-wifi-setup", config=config)
+        name = "ovos-PHAL-plugin-wifi-setup"
+        super().__init__(bus=bus, name=name, config=config)
         self.monitoring = False
         self.in_setup = False
         self.client_in_setup = False
+
+        # this is a XDG compliant jsonstorage object similar to self.settings in MycroftSkill
+        # it can be used to keep state
+        self.settings = PrivateSettings(name)
 
         self.connected = False
         self.grace_period = 45
@@ -139,6 +144,7 @@ class WifiSetupPlugin(PHALPlugin):
         # Client selection is presented to the user in the GUI if GUI and touch/mouse are available
         self.bus.on("ovos.phal.wifi.plugin.client.select", self.handle_client_select)
         self.bus.on("ovos.phal.wifi.plugin.skip.setup", self.handle_skip_setup)
+        self.bus.on("ovos.phal.wifi.plugin.fully.offline", self.handle_fully_offline)
         self.bus.on("ovos.phal.wifi.plugin.client.select.page.removed", self.handle_setup_page_removed)
 
         # GUI event to handle user activation of plugin (user selected the plugin in the GUI)
@@ -159,6 +165,25 @@ class WifiSetupPlugin(PHALPlugin):
 
         self.enclosure = EnclosureAPI(bus=self.bus, skill_id=self.name)
         self.start_internet_check()
+
+
+    @property
+    def first_boot(self):
+        return self.settings.get("first_boot", True)
+
+    @first_boot.setter
+    def first_boot(self, val):
+        self.settings["first_boot"] = bool(val)
+        self.settings.store()
+
+    @property
+    def enable_watchdog(self):
+        return self.settings.get("enable_watchdog", True)
+
+    @enable_watchdog.setter
+    def enable_watchdog(self, val):
+        self.settings["enable_watchdog"] = bool(val)
+        self.settings.store()
 
     # Generic Status Check
     ############################################################################
@@ -299,8 +324,9 @@ class WifiSetupPlugin(PHALPlugin):
         page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
-        self.gui.show_page(page, override_animations=True)
-
+        self.gui.show_page(page, override_idle=self.first_boot or None,
+                           override_animations=True)
+        
     def handle_skip_setup(self, message=None):
         self.in_setup = False
         self.client_in_setup = False
@@ -313,7 +339,22 @@ class WifiSetupPlugin(PHALPlugin):
         # set the plugin setup mode to 1 (skip setup)
         self.plugin_setup_mode = 1
 
+    def handle_fully_offline(self, message=None):
+        self.in_setup = False
+        self.client_in_setup = False
+        self.active_client = None
+        self.active_client_id = None
+        self.monitoring = False
+        self.enable_watchdog = False
+        self.plugin_setup_mode = 1
+
+        # First boot setup completed
+        self.first_boot = False
+
     def handle_user_activated(self, message=None):
+        # enable the watchdog if user activated the service manually
+        self.enable_watchdog = True
+        
         # first check the plugin setup mode
         if self.plugin_setup_mode == 1:
             self.plugin_setup_mode = 0
@@ -331,11 +372,14 @@ class WifiSetupPlugin(PHALPlugin):
 
     def start_internet_check(self):
         # Check the plugin setup mode to see if we should start the internet check
-        if self.plugin_setup_mode == 0:
-            create_daemon(self._watchdog)
+        if self.enable_watchdog:
+            if self.plugin_setup_mode == 0:
+                create_daemon(self._watchdog)
+            else:
+                LOG.info("Internet check disabled by user")
         else:
-            LOG.info("Internet check disabled by user")
-
+            LOG.info("Internet check disabled by skip network setup")
+        
     def stop_internet_check(self):
         self.monitoring = False
 
@@ -368,6 +412,9 @@ class WifiSetupPlugin(PHALPlugin):
                         LOG.info("LAUNCH SETUP")
                         try:
                             self.launch_networking_setup()  # blocking
+                            if self.first_boot:
+                                LOG.debug("First boot setup completed")
+                                self.first_boot = False
                         except Exception as e:
                             LOG.exception(e)
                     else:
@@ -440,6 +487,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.gui.release()
         self.bus.emit(Message("ovos.phal.wifi.plugin.stop.setup.event"))
         self.in_setup = False
+
+        # Disable first boot once setup is asked to stop
+        self.first_boot = False
 
     def shutdown(self):
         self.monitoring = False
