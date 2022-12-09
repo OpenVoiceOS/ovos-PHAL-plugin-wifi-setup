@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a1...HEAD)
+
+**Merged pull requests:**
+
+- Add messagebus events to notify disconnection and query status [\#12](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/12) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.0.1a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.1a1) (2022-12-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0...V1.0.1a1)
 
 **Merged pull requests:**
 
