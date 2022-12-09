@@ -83,7 +83,7 @@ from ovos_utils.network_utils import is_connected
 # type: Request
 # description: Inform the wifi plugin that the internet is connected
 #
-# mycroft.internet.disconnected
+# enclosure.notify.no_internet
 # type: Response
 # description: Notify watchdog detected internet disconnected
 #
@@ -416,7 +416,7 @@ class WifiSetupPlugin(PHALPlugin):
                     continue
 
                 if not is_connected():
-                    self.bus.emit(Message("mycroft.internet.disconnected"))
+                    self.bus.emit(Message("enclosure.notify.no_internet"))
                     LOG.info("NO INTERNET")
                     if not self.is_connected_to_wifi():
                         LOG.info("LAUNCH SETUP")
