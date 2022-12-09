@@ -87,6 +87,10 @@ from ovos_utils.network_utils import is_connected
 # type: Response
 # description: Notify watchdog detected internet disconnected
 #
+# ovos.phal.wifi.plugin.fully_offline
+# type: Response
+# description: Notify that the user has selected fully offline operation
+#
 # ovos.phal.wifi.plugin.alive
 # type: Response
 # description: Inform the wifi clients that the plugin is alive on startup
@@ -359,6 +363,11 @@ class WifiSetupPlugin(PHALPlugin):
 
         # First boot setup completed
         self.first_boot = False
+
+        # Notify any listeners that we're in offline mode now
+        message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
+            Message("ovos.phal.wifi.plugin.fully_offline")
+        self.bus.emit(message)
 
     def handle_user_activated(self, message=None):
         # enable the watchdog if user activated the service manually
