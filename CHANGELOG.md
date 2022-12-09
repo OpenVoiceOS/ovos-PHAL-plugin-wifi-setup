@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0...HEAD)
+
+**Merged pull requests:**
+
+- Add first\_boot flag for page management and enable\_watchdog flag for no boot watchdog [\#8](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/8) ([AIIX](https://github.com/AIIX))
+
+## [V1.0.0](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0) (2022-11-14)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a9...V1.0.0)
+
 ## [V1.0.0a9](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.0a9) (2022-11-14)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.0a8...V1.0.0a9)
