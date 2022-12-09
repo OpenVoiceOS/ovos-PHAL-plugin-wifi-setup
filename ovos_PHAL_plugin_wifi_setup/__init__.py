@@ -446,7 +446,8 @@ class WifiSetupPlugin(PHALPlugin):
                             LOG.exception(e)
                     else:
                         LOG.warning("CONNECTED TO WIFI, BUT NO INTERNET!!")
-
+                    if is_connected():
+                        self.bus.emit(Message("mycroft.internet.connected"))
                 sleep(self.time_between_checks)
         except Exception as e:
             LOG.error("Wifi watchdog crashed unexpectedly")
