@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a1...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a2...HEAD)
+
+**Merged pull requests:**
+
+- Emit `mycroft.internet.connected` on setup completion [\#13](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/13) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.0.1a2](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.1a2) (2022-12-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a1...V1.0.1a2)
 
 **Merged pull requests:**
 
