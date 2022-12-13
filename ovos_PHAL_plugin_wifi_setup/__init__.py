@@ -471,27 +471,7 @@ class WifiSetupPlugin(PHALPlugin):
         self.bus.emit(Message("ovos.phal.wifi.plugin.setup.launched"))
 
         try:
-            if (is_gui_running() or is_gui_connected(self.bus)) and can_use_touch_mouse():
-                LOG.debug("GUI / INPUT DETECTED LAUNCHING GUI")
-                self.display_client_select()
-            else:
-                # First lets check if we have a client that can setup without requiring a physical input method
-                # If we do find a registered client that has requires_input set to false, we can use it
-                # example (balena-wifi-setup)
-                LOG.debug("LAUNCHING NON INPUT INTERACTIVE SETUP")
-
-                # First check if there are any clients registered at all
-                if len(self.registered_clients) == 0:
-                    LOG.error("No clients registered")
-
-                # Check if there are any clients that do not require input
-                for client in self.registered_clients:
-                    if not client["requires_input"]:
-                        self.handle_set_active_client(Message("ovos.phal.wifi.plugin.set.active.client", {
-                            "client": client["client"],
-                            "id": client["id"]
-                        }))
-                        return
+            self.display_client_select()
 
         except Exception as e:
             LOG.exception(e)
