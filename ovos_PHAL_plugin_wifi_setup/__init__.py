@@ -5,6 +5,7 @@ from os.path import dirname, join
 from time import sleep
 
 from mycroft_bus_client.message import Message
+from ovos_config.config import update_mycroft_config
 from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
@@ -298,6 +299,9 @@ class WifiSetupPlugin(PHALPlugin):
             self.active_client_id = None
             if is_connected():
                 self.bus.emit(Message("mycroft.internet.connected"))
+                # Notify any listeners that we're in online mode now
+                if self.config_core.get("enable_offline"):
+                    update_mycroft_config({"enable_offline": False})
         self.client_in_setup = False
 
     # Client Setup Control Section
@@ -374,6 +378,9 @@ class WifiSetupPlugin(PHALPlugin):
         self.first_boot = False
 
         # Notify any listeners that we're in offline mode now
+        if not self.config_core.get("enable_offline"):
+            update_mycroft_config({"enable_offline": True})
+
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
             Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
