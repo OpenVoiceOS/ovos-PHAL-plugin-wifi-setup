@@ -163,7 +163,6 @@ class WifiSetupPlugin(PHALPlugin):
         # or via voice command (user activated the plugin via voice command)
         self.bus.on("ovos.phal.wifi.plugin.user.activated", self.handle_user_activated)
 
-
         # Handle Internet Connected Event
         self.bus.on("mycroft.internet.connected", self.handle_internet_connected)
 
@@ -405,7 +404,8 @@ class WifiSetupPlugin(PHALPlugin):
                 create_daemon(self._watchdog)
             else:
                 LOG.info("Internet check disabled by user")
-        else:
+        else:  # User selected offline mode
+            self.plugin_setup_mode = 1  # Advertise internet is ready
             LOG.info("Internet check disabled by skip network setup")
         
     def stop_internet_check(self):
