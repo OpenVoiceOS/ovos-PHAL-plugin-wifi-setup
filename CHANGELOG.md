@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a3...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a4...HEAD)
+
+**Merged pull requests:**
+
+- Reload client selection if clients register after GUI displays [\#16](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/16) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.0.1a4](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.1a4) (2022-12-14)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a3...V1.0.1a4)
 
 **Fixed bugs:**
 
