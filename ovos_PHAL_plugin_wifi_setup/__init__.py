@@ -251,7 +251,9 @@ class WifiSetupPlugin(PHALPlugin):
             }))
 
             # Update the GUI so client selection has all options
-            if self.gui.get("clients_model"):
+            if self.gui.get("clients_model") and \
+                    self.gui["clients_model"] != self.registered_clients:
+                LOG.debug(f"Updating GUI with new clients")
                 self.gui["clients_model"] = self.registered_clients
             LOG.info("Registered wifi client: " + client_plugin_name)
 
