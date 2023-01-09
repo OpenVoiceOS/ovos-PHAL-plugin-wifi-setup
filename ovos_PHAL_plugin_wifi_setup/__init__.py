@@ -249,6 +249,12 @@ class WifiSetupPlugin(PHALPlugin):
                 "requires_input": client_plugin_requires_input,
                 "id": client_plugin_id
             }))
+
+            # Update the GUI so client selection has all options
+            if self.gui.get("clients_model") and \
+                    self.gui["clients_model"] != self.registered_clients:
+                LOG.debug(f"Updating GUI with new clients")
+                self.gui["clients_model"] = self.registered_clients
             LOG.info("Registered wifi client: " + client_plugin_name)
 
     def handle_deregister_client(self, message=None):
