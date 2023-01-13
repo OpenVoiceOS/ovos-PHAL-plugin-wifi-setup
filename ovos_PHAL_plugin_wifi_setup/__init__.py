@@ -505,17 +505,23 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_internet_connected(self, message=None):
         """System came online later after booting."""
+        message = message or Message("test")
         self.enclosure.mouth_reset()
         # sync clock as soon as we have internet
-        self.bus.emit(Message("system.ntp.sync"))
+        self.bus.emit(message.forward("system.ntp.sync"))
         # We don't know if the user has configured setup, so we'll just emit a message for setup skill
-        self.bus.emit(Message("ovos.wifi.setup.completed"))
+        self.bus.emit(message.forward("ovos.wifi.setup.completed"))
+        # Make sure the GUI spinner is dismissed
+        self.bus.emit(message.forward("ovos.shell.status.ok"))
         self.stop_setup()  # just in case
 
     def handle_ready_check(self, message=None):
         """ Check if internet is ready """
-        self.bus.emit(message.response({
-            "status": self.plugin_setup_mode == 1 or is_connected()}))
+        status = self.plugin_setup_mode == 1 or is_connected()
+        if self.client_in_setup:
+            LOG.debug(f"Still in setup, wait for completion")
+            status = False
+        self.bus.emit(message.response({"status": status}))
 
     def stop_setup(self):
         self.gui.release()
