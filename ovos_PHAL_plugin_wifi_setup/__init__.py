@@ -255,6 +255,9 @@ class WifiSetupPlugin(PHALPlugin):
                     self.gui["clients_model"] != self.registered_clients:
                 LOG.debug(f"Updating GUI with new clients")
                 self.gui["clients_model"] = self.registered_clients
+            else:
+                LOG.debug(f"Not updating gui with clients: "
+                          f"{self.gui.get('clients_model')}")
             LOG.info("Registered wifi client: " + client_plugin_name)
 
     def handle_deregister_client(self, message=None):
