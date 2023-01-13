@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a4...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a5...HEAD)
+
+**Merged pull requests:**
+
+- Fix bug missed in \#16 when no clients are displayed at setup init [\#17](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/17) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.0.1a5](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.1a5) (2023-01-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a4...V1.0.1a5)
 
 **Merged pull requests:**
 
