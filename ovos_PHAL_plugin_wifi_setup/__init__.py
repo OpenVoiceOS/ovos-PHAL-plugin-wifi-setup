@@ -251,9 +251,9 @@ class WifiSetupPlugin(PHALPlugin):
             }))
 
             # Update the GUI so client selection has all options
-            if self.gui.get("clients_model") is not None and \
-                    self.gui["clients_model"] != self.registered_clients:
-                LOG.debug(f"Updating GUI with new clients")
+            if self.gui.get('page_type') == "ModeChoose":
+                LOG.info(f"Updating GUI with new clients: "
+                         f"{self.registered_clients}")
                 self.gui["clients_model"] = self.registered_clients
             else:
                 LOG.debug(f"Not updating gui with clients: "
@@ -449,7 +449,7 @@ class WifiSetupPlugin(PHALPlugin):
                     if not self.is_connected_to_wifi():
                         LOG.info("LAUNCH SETUP")
                         try:
-                            self.launch_networking_setup()  # blocking
+                            self.launch_networking_setup()  # non-blocking
                             if self.first_boot:
                                 LOG.debug("First boot setup completed")
                                 self.first_boot = False
