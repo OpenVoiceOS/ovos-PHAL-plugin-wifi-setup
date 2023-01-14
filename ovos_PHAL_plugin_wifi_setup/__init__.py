@@ -251,10 +251,13 @@ class WifiSetupPlugin(PHALPlugin):
             }))
 
             # Update the GUI so client selection has all options
-            if self.gui.get("clients_model") is not None and \
-                    self.gui["clients_model"] != self.registered_clients:
-                LOG.debug(f"Updating GUI with new clients")
+            if self.gui.get('page_type') == "ModeChoose":
+                LOG.info(f"Updating GUI with new clients: "
+                         f"{self.registered_clients}")
                 self.gui["clients_model"] = self.registered_clients
+            else:
+                LOG.debug(f"Not updating gui with clients: "
+                          f"{self.gui.get('clients_model')}")
             LOG.info("Registered wifi client: " + client_plugin_name)
 
     def handle_deregister_client(self, message=None):
@@ -446,7 +449,7 @@ class WifiSetupPlugin(PHALPlugin):
                     if not self.is_connected_to_wifi():
                         LOG.info("LAUNCH SETUP")
                         try:
-                            self.launch_networking_setup()  # blocking
+                            self.launch_networking_setup()  # non-blocking
                             if self.first_boot:
                                 LOG.debug("First boot setup completed")
                                 self.first_boot = False
@@ -505,17 +508,24 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_internet_connected(self, message=None):
         """System came online later after booting."""
+        message = message or Message("test")
         self.enclosure.mouth_reset()
         # sync clock as soon as we have internet
-        self.bus.emit(Message("system.ntp.sync"))
+        self.bus.wait_for_response(message.forward("system.ntp.sync"),
+                                   "system.ntp.sync.complete")
         # We don't know if the user has configured setup, so we'll just emit a message for setup skill
-        self.bus.emit(Message("ovos.wifi.setup.completed"))
+        self.bus.emit(message.forward("ovos.wifi.setup.completed"))
+        # Make sure the GUI spinner is dismissed
+        self.bus.emit(message.forward("ovos.shell.status.ok"))
         self.stop_setup()  # just in case
 
     def handle_ready_check(self, message=None):
         """ Check if internet is ready """
-        self.bus.emit(message.response({
-            "status": self.plugin_setup_mode == 1 or is_connected()}))
+        status = self.plugin_setup_mode == 1 or is_connected()
+        if self.client_in_setup:
+            LOG.debug(f"Still in setup, wait for completion")
+            status = False
+        self.bus.emit(message.response({"status": status}))
 
     def stop_setup(self):
         self.gui.release()
@@ -527,6 +537,7 @@ class WifiSetupPlugin(PHALPlugin):
 
     def shutdown(self):
         self.monitoring = False
-        self.bus.remove("mycroft.internet.connected", self.handle_internet_connected)
+        self.bus.remove("mycroft.internet.connected",
+                        self.handle_internet_connected)
         self.stop_setup()
         super().shutdown()
