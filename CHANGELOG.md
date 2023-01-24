@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
+## [V1.0.1a7](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.0.1a7) (2023-01-14)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a6...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.0.1a6...V1.0.1a7)
 
 **Merged pull requests:**
 
