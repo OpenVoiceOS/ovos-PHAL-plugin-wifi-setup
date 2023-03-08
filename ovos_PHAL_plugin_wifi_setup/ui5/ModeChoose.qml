@@ -1,9 +1,9 @@
-import QtQuick.Layouts 1.15
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick.Layouts 1.4
+import QtQuick 2.4
+import QtQuick.Controls 2.0
+import org.kde.kirigami 2.4 as Kirigami
 import Mycroft 1.0 as Mycroft
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 
 
 Rectangle {
@@ -68,16 +68,16 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
 
-                    onClicked: (mouse)=> {
+                    onClicked: {
                         Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/ui_sounds_clicked.wav"))
                         Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.client.select", {"client": model.client, "id": model.id})
                     }
 
-                    onPressed: (mouse)=> {
+                    onPressed: {
                         gridItem.color = Qt.rgba(1, 1, 1, 0.2)
                         onDisplayIconLabelBackground.color = Qt.darker(Kirigami.Theme.backgroundColor, 2)
                     }
-                    onReleased: (mouse)=> {
+                    onReleased: {
                         gridItem.color = "transparent"
                         onDisplayIconLabelBackground.color = Kirigami.Theme.highlightColor
                     }
