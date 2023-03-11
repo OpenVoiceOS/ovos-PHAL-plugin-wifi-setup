@@ -31,7 +31,7 @@ Rectangle {
 
         Label {
             id: headerAreaLabel
-            text: qstr("Setup Networking")
+            text: qsTr("Setup Networking")
             anchors.fill: parent
             anchors.margins: Kirigami.Units.largeSpacing
             verticalAlignment: Text.AlignVCenter
