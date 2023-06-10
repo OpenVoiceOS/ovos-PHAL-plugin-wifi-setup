@@ -134,37 +134,50 @@ class WifiSetupPlugin(PHALPlugin):
         self.active_client = None
         self.active_client_id = None
         self.registered_clients = []
-        self.gui = GUIInterface(bus=self.bus, skill_id=self.name)
+        self.gui = GUIInterface(bus=self.bus, skill_id=self.name,
+                                config=self.config_core.get('gui'))
 
         # 0 = Normal Operation, 1 = Skipped (User selected to skip setup)
-        # if the user selected to skip setup, we will not start the setup process or check for internet, etc.
-        # until the user explicitly tells us to start the setup process again either through VUI or GUI interaction
+        # if the user selected to skip setup, we will not start the setup
+        # process or check for internet, etc. until the user explicitly tells us
+        # to start the setup process again either through VUI or GUI interaction
         self.plugin_setup_mode = 0
 
         # Manage client registration, activation and deactivation
         # Multiple clients can be registered, but only one can be active at a time
-        self.bus.on("ovos.phal.wifi.plugin.register.client", self.handle_register_client)
-        self.bus.on("ovos.phal.wifi.plugin.deregister.client", self.handle_deregister_client)
-        self.bus.on("ovos.phal.wifi.plugin.get.registered.clients", self.handle_get_registered_clients)
-        self.bus.on("ovos.phal.wifi.plugin.set.active.client", self.handle_set_active_client)
-        self.bus.on("ovos.phal.wifi.plugin.remove.active.client", self.handle_remove_active_client)
+        self.bus.on("ovos.phal.wifi.plugin.register.client",
+                    self.handle_register_client)
+        self.bus.on("ovos.phal.wifi.plugin.deregister.client",
+                    self.handle_deregister_client)
+        self.bus.on("ovos.phal.wifi.plugin.get.registered.clients",
+                    self.handle_get_registered_clients)
+        self.bus.on("ovos.phal.wifi.plugin.set.active.client",
+                    self.handle_set_active_client)
+        self.bus.on("ovos.phal.wifi.plugin.remove.active.client",
+                    self.handle_remove_active_client)
 
         # Manage when the client is in setup and out of setup
-        self.bus.on("ovos.phal.wifi.plugin.client.setup.failure", self.handle_client_setup_failure)
+        self.bus.on("ovos.phal.wifi.plugin.client.setup.failure",
+                    self.handle_client_setup_failure)
 
         # GUI event to handle client selection
         # Client selection is presented to the user in the GUI if GUI and touch/mouse are available
-        self.bus.on("ovos.phal.wifi.plugin.client.select", self.handle_client_select)
+        self.bus.on("ovos.phal.wifi.plugin.client.select",
+                    self.handle_client_select)
         self.bus.on("ovos.phal.wifi.plugin.skip.setup", self.handle_skip_setup)
-        self.bus.on("ovos.phal.wifi.plugin.fully.offline", self.handle_fully_offline)
-        self.bus.on("ovos.phal.wifi.plugin.client.select.page.removed", self.handle_setup_page_removed)
+        self.bus.on("ovos.phal.wifi.plugin.fully.offline",
+                    self.handle_fully_offline)
+        self.bus.on("ovos.phal.wifi.plugin.client.select.page.removed",
+                    self.handle_setup_page_removed)
 
         # GUI event to handle user activation of plugin (user selected the plugin in the GUI)
         # or via voice command (user activated the plugin via voice command)
-        self.bus.on("ovos.phal.wifi.plugin.user.activated", self.handle_user_activated)
+        self.bus.on("ovos.phal.wifi.plugin.user.activated",
+                    self.handle_user_activated)
 
         # Handle Internet Connected Event
-        self.bus.on("mycroft.internet.connected", self.handle_internet_connected)
+        self.bus.on("mycroft.internet.connected",
+                    self.handle_internet_connected)
 
         # When the plugin comes online, we need to emit a message so clients can register
         self.bus.emit(Message("ovos.phal.wifi.plugin.alive"))
