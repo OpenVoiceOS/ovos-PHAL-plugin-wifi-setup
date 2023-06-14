@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.1.0...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.1.1a1...HEAD)
+
+**Merged pull requests:**
+
+- Update messagebus package dependency [\#23](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/23) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V1.1.1a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/V1.1.1a1) (2023-06-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/V1.1.0...V1.1.1a1)
 
 **Fixed bugs:**
 
