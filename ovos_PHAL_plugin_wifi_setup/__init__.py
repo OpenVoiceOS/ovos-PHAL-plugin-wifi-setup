@@ -4,7 +4,7 @@ import uuid
 from os.path import dirname, join
 from time import sleep
 
-from mycroft_bus_client.message import Message
+from ovos_bus_client.message import Message
 from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
