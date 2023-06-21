@@ -6,6 +6,7 @@ from time import sleep
 
 from ovos_bus_client.message import Message
 from ovos_plugin_manager.phal import PHALPlugin
+from ovos_utils import classproperty
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
 from ovos_utils.enclosure.api import EnclosureAPI
@@ -14,6 +15,8 @@ from ovos_utils.gui import (GUIInterface,
 from ovos_utils.log import LOG
 from ovos_utils.skills.settings import PrivateSettings
 from ovos_utils.network_utils import is_connected
+from ovos_utils.process_utils import RuntimeRequirements
+
 
 # Event Documentation
 # ===================
@@ -190,6 +193,15 @@ class WifiSetupPlugin(PHALPlugin):
         self.enclosure = EnclosureAPI(bus=self.bus, skill_id=self.name)
         self.start_internet_check()
 
+    @classproperty
+    def runtime_requirements(self):
+        return RuntimeRequirements(internet_before_load=False,
+                                   network_before_load=False,
+                                   requires_internet=False,
+                                   requires_network=False,
+                                   no_internet_fallback=True,
+                                   no_network_fallback=True)
+
     @property
     def first_boot(self):
         return self.settings.get("first_boot", True)
@@ -230,11 +242,15 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Fist make sure the required parameters are present
         if not client_plugin_name or not client_plugin_type or not client_plugin_display_text:
-            self.bus.emit(Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+            self.bus.emit(
+                Message("ovos.phal.wifi.plugin.client.registration.failure",
+                        {"error": "Missing required parameters"}))
             return
 
         if not client_plugin_has_gui and not client_plugin_requires_input:
-            self.bus.emit(Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+            self.bus.emit(
+                Message("ovos.phal.wifi.plugin.client.registration.failure",
+                        {"error": "Missing required parameters"}))
             return
 
         # Use the client plugin id for activation and deactivation rather than depending on parameters in the message
@@ -363,7 +379,7 @@ class WifiSetupPlugin(PHALPlugin):
         self.gui["clients_model"] = self.registered_clients
         self.gui.show_page(page, override_idle=self.first_boot or None,
                            override_animations=True)
-        
+
     def handle_skip_setup(self, message=None):
         self.in_setup = False
         self.client_in_setup = False
@@ -403,7 +419,7 @@ class WifiSetupPlugin(PHALPlugin):
     def handle_user_activated(self, message=None):
         # enable the watchdog if user activated the service manually
         self.enable_watchdog = True
-        
+
         # first check the plugin setup mode
         if self.plugin_setup_mode == 1:
             self.plugin_setup_mode = 0
@@ -429,7 +445,7 @@ class WifiSetupPlugin(PHALPlugin):
         else:  # User selected offline mode
             self.plugin_setup_mode = 1  # Advertise internet is ready
             LOG.info("Internet check disabled by skip network setup")
-        
+
     def stop_internet_check(self):
         self.monitoring = False
 
