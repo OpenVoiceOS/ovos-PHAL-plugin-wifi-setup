@@ -16,7 +16,6 @@ from ovos_utils.log import LOG
 from ovos_utils.skills.settings import PrivateSettings
 from ovos_utils.network_utils import is_connected
 from ovos_utils.process_utils import RuntimeRequirements
-from time import sleep
 
 
 # Event Documentation
