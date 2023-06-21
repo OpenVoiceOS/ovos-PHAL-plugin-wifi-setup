@@ -243,12 +243,14 @@ class WifiSetupPlugin(PHALPlugin):
         # Fist make sure the required parameters are present
         if not client_plugin_name or not client_plugin_type or not client_plugin_display_text:
             self.bus.emit(
-                Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+                Message("ovos.phal.wifi.plugin.client.registration.failure",
+                        {"error": "Missing required parameters"}))
             return
 
         if not client_plugin_has_gui and not client_plugin_requires_input:
             self.bus.emit(
-                Message("ovos.phal.wifi.plugin.client.registration.failure", {"error": "Missing required parameters"}))
+                Message("ovos.phal.wifi.plugin.client.registration.failure",
+                        {"error": "Missing required parameters"}))
             return
 
         # Use the client plugin id for activation and deactivation rather than depending on parameters in the message
@@ -392,7 +394,7 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Notify any listeners that we're in offline mode now
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
-                  Message("ovos.phal.wifi.plugin.fully_offline")
+            Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
         self.gui.clear()
 
@@ -410,7 +412,7 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Notify any listeners that we're in offline mode now
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
-                  Message("ovos.phal.wifi.plugin.fully_offline")
+            Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
         self.gui.clear()
 
