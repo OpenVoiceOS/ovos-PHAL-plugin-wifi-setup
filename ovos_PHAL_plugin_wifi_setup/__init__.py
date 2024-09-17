@@ -9,11 +9,11 @@ from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import classproperty
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
-from ovos_utils.enclosure.api import EnclosureAPI
-from ovos_utils.gui import (GUIInterface,
-                            is_gui_running, is_gui_connected)
+from ovos_utils.gui import is_gui_running, is_gui_connected
+from ovos_bus_client.apis.enclosure import EnclosureAPI
+from ovos_bus_client.apis.gui import GUIInterface
 from ovos_utils.log import LOG
-from ovos_utils.skills.settings import PrivateSettings
+from ovos_workshop.settings import PrivateSettings
 from ovos_utils.network_utils import is_connected
 from ovos_utils.process_utils import RuntimeRequirements
 
