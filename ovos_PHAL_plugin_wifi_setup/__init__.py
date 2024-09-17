@@ -1,19 +1,19 @@
-import subprocess
 import random
+import subprocess
 import uuid
 from os.path import dirname, join
 from time import sleep
 
+from ovos_bus_client.apis.enclosure import EnclosureAPI
+from ovos_bus_client.apis.gui import GUIInterface
 from ovos_bus_client.message import Message
+from ovos_config.config import update_mycroft_config
 from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils import classproperty
 from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
 from ovos_utils.gui import is_gui_running, is_gui_connected
-from ovos_bus_client.apis.enclosure import EnclosureAPI
-from ovos_bus_client.apis.gui import GUIInterface
 from ovos_utils.log import LOG
-from ovos_workshop.settings import PrivateSettings
 from ovos_utils.network_utils import is_connected
 from ovos_utils.process_utils import RuntimeRequirements
 
@@ -124,10 +124,6 @@ class WifiSetupPlugin(PHALPlugin):
         self.in_setup = False
         self.client_in_setup = False
 
-        # this is a XDG compliant jsonstorage object similar to self.settings in MycroftSkill
-        # it can be used to keep state
-        self.settings = PrivateSettings(name)
-
         # self.connected = False
         self.grace_period = 45
         self.time_between_checks = 30
@@ -204,21 +200,23 @@ class WifiSetupPlugin(PHALPlugin):
 
     @property
     def first_boot(self):
-        return self.settings.get("first_boot", True)
+        return self.config.get("first_boot", True)
 
     @first_boot.setter
     def first_boot(self, val):
-        self.settings["first_boot"] = bool(val)
-        self.settings.store()
+        self.config["first_boot"] = bool(val)
+        new_config = {"PHAL": {self.name: self.config}}
+        update_mycroft_config(config=new_config, bus=self.bus)
 
     @property
     def enable_watchdog(self):
-        return self.settings.get("enable_watchdog", True)
+        return self.config.get("enable_watchdog", True)
 
     @enable_watchdog.setter
     def enable_watchdog(self, val):
-        self.settings["enable_watchdog"] = bool(val)
-        self.settings.store()
+        self.config["enable_watchdog"] = bool(val)
+        new_config = {"PHAL": {self.name: self.config}}
+        update_mycroft_config(config=new_config, bus=self.bus)
 
     # Generic Status Check
     ############################################################################
@@ -394,7 +392,7 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Notify any listeners that we're in offline mode now
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
-            Message("ovos.phal.wifi.plugin.fully_offline")
+                  Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
         self.gui.clear()
 
@@ -412,7 +410,7 @@ class WifiSetupPlugin(PHALPlugin):
 
         # Notify any listeners that we're in offline mode now
         message = message.forward("ovos.phal.wifi.plugin.fully_offline") or \
-            Message("ovos.phal.wifi.plugin.fully_offline")
+                  Message("ovos.phal.wifi.plugin.fully_offline")
         self.bus.emit(message)
         self.gui.clear()
 
