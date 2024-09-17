@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2a2](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.2a2) (2024-09-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.2a1...1.1.2a2)
+
+**Merged pull requests:**
+
+- feat:semver [\#27](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/27) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.1.2a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.2a1) (2024-01-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.1...1.1.2a1)
