@@ -1,12 +1,12 @@
 # Changelog
 
-## [1.1.4a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.4a1) (2024-10-23)
+## [1.1.5a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.5a1) (2024-11-04)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.3...1.1.4a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.4...1.1.5a1)
 
 **Merged pull requests:**
 
-- fix:deprecation warnings [\#31](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/31) ([JarbasAl](https://github.com/JarbasAl))
+- fix: Update requirements.txt [\#33](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/33) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
