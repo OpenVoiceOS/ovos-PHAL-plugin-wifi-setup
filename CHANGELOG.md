@@ -1,12 +1,12 @@
 # Changelog
 
-## [1.1.5a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.5a1) (2024-11-04)
+## [1.1.6a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.6a1) (2024-11-06)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.4...1.1.5a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.5...1.1.6a1)
 
 **Merged pull requests:**
 
-- fix: Update requirements.txt [\#33](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/33) ([JarbasAl](https://github.com/JarbasAl))
+- fix:allow latest bus client [\#35](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/35) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
