@@ -14,7 +14,7 @@ from ovos_utils import create_daemon
 from ovos_utils.device_input import can_use_touch_mouse
 from ovos_utils.gui import is_gui_running, is_gui_connected
 from ovos_utils.log import LOG
-from ovos_utils.network_utils import is_connected
+from ovos_utils.network_utils import is_connected_http
 from ovos_utils.process_utils import RuntimeRequirements
 
 
@@ -331,7 +331,7 @@ class WifiSetupPlugin(PHALPlugin):
         if self.active_client_id is not None:
             self.bus.emit(Message(f"ovos.phal.wifi.plugin.deactivate.{self.active_client_id}"))
             self.active_client_id = None
-            if is_connected():
+            if is_connected_http():
                 self.bus.emit(Message("mycroft.internet.connected"))
         self.client_in_setup = False
 
@@ -470,7 +470,7 @@ class WifiSetupPlugin(PHALPlugin):
                     sleep(1)  # let client and setup do it's thing
                     continue
 
-                if not is_connected():
+                if not is_connected_http():
                     self.bus.emit(Message("enclosure.notify.no_internet"))
                     LOG.info("NO INTERNET")
                     if not self.is_connected_to_wifi():
@@ -548,7 +548,7 @@ class WifiSetupPlugin(PHALPlugin):
 
     def handle_ready_check(self, message=None):
         """ Check if internet is ready """
-        status = self.plugin_setup_mode == 1 or is_connected()
+        status = self.plugin_setup_mode == 1 or is_connected_http()
         if self.client_in_setup:
             LOG.debug(f"Still in setup, wait for completion")
             status = False
