@@ -134,6 +134,7 @@ class WifiSetupPlugin(PHALPlugin):
         self.active_client_id = None
         self.registered_clients = []
         self.gui = GUIInterface(bus=self.bus, skill_id=self.name,
+                                ui_directories={"qt5": join(dirname(__file__), "gui", "qt5")},
                                 config=self.config_core.get('gui'))
 
         # 0 = Normal Operation, 1 = Skipped (User selected to skip setup)
@@ -372,7 +373,7 @@ class WifiSetupPlugin(PHALPlugin):
     def display_client_select(self, message=None):
         self.in_setup = True
         self.gui.clear()
-        page = join(dirname(__file__), "ui", "WifiPluginClientLoader.qml")
+        page = "WifiPluginClientLoader"
         self.gui["page_type"] = "ModeChoose"
         self.gui["clients_model"] = self.registered_clients
         self.gui.show_page(page, override_idle=self.first_boot or None,
