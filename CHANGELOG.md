@@ -1,12 +1,12 @@
 # Changelog
 
-## [1.1.8a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.8a1) (2024-12-10)
+## [1.1.9a1](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.9a1) (2025-12-18)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.7...1.1.8a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.8...1.1.9a1)
 
 **Merged pull requests:**
 
-- fix: gui deprecated usage [\#37](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/37) ([JarbasAl](https://github.com/JarbasAl))
+- chore: Configure Renovate [\#39](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/39) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
