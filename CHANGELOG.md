@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.9a4](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.9a4) (2025-12-19)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.9a3...1.1.9a4)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency ovos-workshop to v8 [\#46](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/pull/46) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.1.9a3](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/tree/1.1.9a3) (2025-12-19)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup/compare/1.1.9a2...1.1.9a3)
