@@ -1,4 +1,9 @@
 # OVOS PHAL PLUGIN WIFI SETUP
+
+> **DEPRECATION WARNING**: this reposittory was used in the original mycroft mark2 images and is no longer needed or maintained
+
+------------
+
 This PHAL plugin provides a central networking clients management interface.
 
 ### What is the Networking Client Management Interface ?
